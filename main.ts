@@ -62,3 +62,4 @@ Object.entries(seasons).forEach(([season, seasonInfo]) => {
 console.log("Отдел:", maxDepartment);
 console.log("Количество:", maxNewHiredCount);
 console.log("Имена:", maxNewHiredNames.join(", "));
+console.log("test");
