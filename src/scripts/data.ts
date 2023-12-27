@@ -6,7 +6,7 @@ export let seasons: TSeasons = {
     closeProjects: 12,
     income: 600000,
     hired: 3,
-    dismissed: 15,
+    dismissed: 1,
     newProjects: 15,
     newHired: [
       {

@@ -2,64 +2,100 @@ import { seasons } from "./src/scripts/data";
 import { TSeason } from "./src/scripts/types";
 import { TNewHired } from "./src/scripts/types";
 
+
+// [1 подзадача]
+
 let maxIncome: TSeason | null = null;
-let maxSeasonName: string | null = null;
-Object.entries(seasons).forEach(([season, seasonInfo]) => {
-  if (!maxIncome || maxIncome.income < seasonInfo.income) {
-    maxIncome = seasonInfo;
-    maxSeasonName = season;
-  }
-});
-
-console.log("Максимальный:", maxSeasonName, maxIncome);
-
 let minIncome: TSeason | null = null;
-let minSeasonName: string | null = null;
-Object.entries(seasons).forEach(([season, seasonInfo]) => {
-  if (!minIncome || seasonInfo.income < minIncome.income) {
-    minIncome = seasonInfo;
-    minSeasonName = season;
-  }
-});
-
-console.log("Минимальный:", minSeasonName, minIncome);
-
 let maxHired: TSeason | null = null;
-let maxHiredSeason: string | null = null;
-Object.entries(seasons).forEach(([season, seasonInfo]) => {
-  if (!maxHired || seasonInfo.hired > maxHired.hired) {
-    maxHired = seasonInfo;
-    maxHiredSeason = season;
-  }
-});
-
-console.log("Больше всего увольнительных за сезон:", maxHiredSeason, maxHired);
-
 let maxDismissed: TSeason | null = null;
-let maxDisSeason: string | null = null;
+
+let maxIncomeValue = Number.MIN_SAFE_INTEGER;
+let minIncomeValue = Number.MAX_SAFE_INTEGER;
+let maxHiredValue = Number.MIN_SAFE_INTEGER;
+let maxDismissedValue = Number.MIN_SAFE_INTEGER;
+
 Object.entries(seasons).forEach(([season, seasonInfo]) => {
-  if (!maxDismissed || seasonInfo.dismissed > maxDismissed.dismissed) {
+  // Находим самый прибыльный сезон
+  if (seasonInfo.income > maxIncomeValue) {
+    maxIncomeValue = seasonInfo.income;
+    maxIncome = seasonInfo;
+  }
+
+  // Находим сезон с самым низким доходом
+  if (seasonInfo.income < minIncomeValue) {
+    minIncomeValue = seasonInfo.income;
+    minIncome = seasonInfo;
+  }
+
+  // Находим сезон с наибольшим количеством новых сотрудников
+  if (seasonInfo.newHired.length > maxHiredValue) {
+    maxHiredValue = seasonInfo.newHired.length;
+    maxHired = seasonInfo;
+  }
+
+  // Находим сезон с наибольшим количеством увольнительных
+  if (seasonInfo.dismissed > maxDismissedValue) {
+    maxDismissedValue = seasonInfo.dismissed;
     maxDismissed = seasonInfo;
-    maxDisSeason = season;
   }
 });
 
-console.log("Больше всего новых за сезон:", maxDisSeason, maxDismissed);
+// Выводим информацию
+console.log("Самый прибыльный сезон:", maxIncome);
+console.log("Сезон с самым низким доходом:", minIncome);
+console.log("Сезон с наибольшим количеством новых сотрудников:", maxHired);
+console.log("Сезон с наибольшим количеством увольнительных:", maxDismissed);
 
-let maxDepartment: string | null = null;
-let maxNewHiredCount: number = 0;
-let maxNewHiredNames: string[] = [];
+
+// [2 подзадача]
+
+let maxNewHiredDepartment: string | null = null;
+let maxExperiencedDepartment: string | null = null;
+let employeesWithClosedProjectsInfo: { name: string; experience: number }[] = [];
+let departmentWithMaxAverageSalary: string | null = null;
+
+let maxNewHiredCount = 0;
+let maxExperiencedCount = 0;
+let maxAverageSalary = 0;
 
 Object.entries(seasons).forEach(([season, seasonInfo]) => {
-  const newHired = seasonInfo.newHired;
+  const newHired: TNewHired[] = seasonInfo.newHired;
+
+  // Находим отдел с наибольшим количеством новых сотрудников
   if (newHired.length > maxNewHiredCount) {
-    maxDepartment = newHired[0].department;
     maxNewHiredCount = newHired.length;
-    maxNewHiredNames = newHired.map((employee) => employee.name);
+    maxNewHiredDepartment = newHired[0].department;
+  }
+
+  // Находим отдел с наибольшим количеством сотрудников с опытом от 3 лет
+  const experiencedEmployees = newHired.filter((employee) => employee.experience > 3);
+  if (experiencedEmployees.length > maxExperiencedCount) {
+    maxExperiencedCount = experiencedEmployees.length;
+    maxExperiencedDepartment = experiencedEmployees[0].department;
+  }
+
+  // Собираем информацию о сотрудниках с закрытыми проектами
+  const closedProjectsEmployees = newHired.filter((employee) => employee.exProject > 0);
+  employeesWithClosedProjectsInfo = employeesWithClosedProjectsInfo.concat(
+    closedProjectsEmployees.map((employee) => ({ name: employee.name, experience: employee.experience }))
+  );
+
+  // Находим отдел с самой большой средней зарплатой
+  const averageSalary = newHired.reduce((sum, employee) => sum + employee.salary, 0) / newHired.length;
+  if (averageSalary > maxAverageSalary) {
+    maxAverageSalary = averageSalary;
+    departmentWithMaxAverageSalary = newHired[0].department;
   }
 });
 
-console.log("Отдел:", maxDepartment);
-console.log("Количество:", maxNewHiredCount);
-console.log("Имена:", maxNewHiredNames.join(", "));
-console.log("test");
+// Выводим информацию
+console.log("Отдел с наибольшим количеством новых сотрудников:", maxNewHiredDepartment);
+console.log("Отдел с наибольшим количеством сотрудников с опытом от 3 лет:", maxExperiencedDepartment);
+console.log("Информация о сотрудниках с закрытыми проектами:", employeesWithClosedProjectsInfo);
+console.log("Отдел с самой большой средней зарплатой:", departmentWithMaxAverageSalary);
+
+
+
+
+
