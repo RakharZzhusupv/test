@@ -4,8 +4,7 @@ export type TSeason = {
   hired: number;
   dismissed: number;
   newProjects: number;
-  newHired:TNewHired [];
-
+  newHired: TNewHired[];
 };
 
 export type TSeasons = {
